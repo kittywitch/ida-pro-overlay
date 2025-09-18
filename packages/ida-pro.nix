@@ -2,6 +2,7 @@
   pkgs,
   lib,
   runfile,
+  normalScript,
   ...
 }:
 let
@@ -104,6 +105,12 @@ pkgs.stdenv.mkDerivation rec {
     for lib in $IDADIR/*.so $IDADIR/*.so.6; do
       ln -s $lib $out/lib/$(basename $lib)
     done
+
+    pushd $out/lib
+    ${pythonForIDA}/bin/python ${normalScript}
+      mv libida.so.patched libida.so
+    popd
+
 
     # Manually patch libraries that dlopen stuff.
     patchelf --add-needed libpython3.13.so $out/lib/libida.so
